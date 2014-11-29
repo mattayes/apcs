@@ -1,7 +1,7 @@
 ## Air Pollution Case Study
 
 ## Packages
-library(tidyr); library(dplyr); library(lubridate); library(ggplot2)
+library(tidyr); library(dplyr); library(lubridate); library(ggplot2); library(grid)
 ## Download data
 if(!file.exists("./data")){
 	dir.create("./data")
@@ -32,8 +32,11 @@ str(sv12)
 summary(sv12)
 
 ## And together
+png("plot1.png")
+par(mfrow = c(1, 2))
 boxplot(sv99, sv12)
 boxplot(log10(sv99), log10(sv12))
+dev.off()
 
 ## What's up with those negative values?
 negative <- sv12 < 0
@@ -43,10 +46,13 @@ mean(negative)
 ## Are negative values associated with time of year?
 dates <- pm12$Date.Local
 str(dates)
-dates <- as.Date(as.character(dates), "%Y%m%d")
+dates <- as.Date(as.character(dates), "%Y-%m-%d")
 str(dates)
+png("plot2.png")
+par(mfrow = c(2, 1))
 hist(dates, "month")
 hist(dates[negative], "month")
+dev.off()
 
 ## Let's follow one monitor over time
 
@@ -96,6 +102,7 @@ b <- ggplot(sub12, aes(Date.Local, Arithmetic.Mean)) +
 		geom_point() +
 		stat_hline(yintercept = median(sub12$Arithmetic.Mean)) +
 		coord_cartesian(ylim = rng)
+png("plot3.png")
 grid.newpage()
 pushViewport(viewport(layout = grid.layout(1, 2)))
 ## Helper function
@@ -103,6 +110,7 @@ vplayout <- function(x, y)
         viewport(layout.pos.row = x, layout.pos.col = y)
 print(a, vp = vplayout(1, 1))
 print(b, vp = vplayout(1, 2))
+dev.off()
 
 ## Show state-wide means and make a plot showing trend
 state99 <- pm99 %>%
@@ -112,9 +120,12 @@ state12 <- pm12 %>%
 		group_by(State.Name) %>%
 		summarize(mean12 = mean(Arithmetic.Mean))
 states <- inner_join(state99, state12)
+par(mfrow = c(1, 1))
+png("plot4.png")
 with(states, {
 		plot(rep(1999, 53), mean99, ylab = expression("PM"[2.5]*" (tons)"), 
 			xlim = c(1998, 2013), main = "State Variation Over Time")
 		points(rep(2012, 53), mean12)
 		segments(rep(1999, 53), mean99, rep(2012, 53), mean12)
 	})
+dev.off()
