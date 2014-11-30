@@ -34,8 +34,8 @@ summary(sv12)
 ## And together
 png("plot1.png")
 par(mfrow = c(1, 2))
-boxplot(sv99, sv12)
-boxplot(log10(sv99), log10(sv12))
+boxplot(sv99, sv12, main = expression("Distribution- PM"[2.5]), xlab = "Year", ylab = "Emissions (tons)")
+boxplot(log10(sv99), log10(sv12), main = expression("Log"[10]*" Distribution- PM"[2.5]), xlab = "Year", ylab = expression("Log emissions (tons)"))
 dev.off()
 
 ## What's up with those negative values?
@@ -80,7 +80,7 @@ or12 <- pm12 %>%
 		filter(State.Name == "Oregon", County.Site %in% sites) %>%
 		group_by(County.Site) %>%
 		summarize(count = n())
-inner_join(or99, or12, by = County.Site)
+inner_join(or99, or12, by = "County.Site")
 
 ## Choose county 29 and site number 133; convert dates
 sub99 <- pm99 %>%
@@ -94,14 +94,18 @@ dim(sub12)
 
 ## Plot data for both years in same panel
 rng <- range(sub99$Arithmetic.Mean, sub12$Arithmetic.Mean)
-a <- ggplot(sub99, aes(Date.Local, Arithmetic.Mean)) +
+a <- ggplot(sub99, aes(month(Date.Local, label = TRUE), Arithmetic.Mean)) +
 		geom_point() +
 		stat_hline(yintercept = median(sub99$Arithmetic.Mean)) +
-		coord_cartesian(ylim = rng)
-b <- ggplot(sub12, aes(Date.Local, Arithmetic.Mean)) +
+		coord_cartesian(ylim = rng) +
+		ggtitle("2009") +
+		labs(x = "Month", y = "Emissions (tons)")
+b <- ggplot(sub12, aes(month(Date.Local, label = TRUE), Arithmetic.Mean)) +
 		geom_point() +
 		stat_hline(yintercept = median(sub12$Arithmetic.Mean)) +
-		coord_cartesian(ylim = rng)
+		coord_cartesian(ylim = rng) +
+		ggtitle("2012") +
+		labs(x = "Month", y = "")
 png("plot3.png")
 grid.newpage()
 pushViewport(viewport(layout = grid.layout(1, 2)))
@@ -120,10 +124,10 @@ state12 <- pm12 %>%
 		group_by(State.Name) %>%
 		summarize(mean12 = mean(Arithmetic.Mean))
 states <- inner_join(state99, state12)
-par(mfrow = c(1, 1))
 png("plot4.png")
+par(mfrow = c(1, 1))
 with(states, {
-		plot(rep(1999, 53), mean99, ylab = expression("PM"[2.5]*" (tons)"), 
+		plot(rep(1999, 53), mean99, xlab = "Year", ylab = "Emissions (tons)"), 
 			xlim = c(1998, 2013), main = "State Variation Over Time")
 		points(rep(2012, 53), mean12)
 		segments(rep(1999, 53), mean99, rep(2012, 53), mean12)
