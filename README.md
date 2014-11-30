@@ -5,11 +5,11 @@ Here's a dive into the Air Quality System data provided by the EPA. I'm looking 
 
 Question: Has air quality in the U.S. improved over time?
 
-You can find more information on the data [here](http://aqsdr1.epa.gov/aqsweb/aqstmp/airdata/download_files.html)
+You can find more information on the data [here](http://aqsdr1.epa.gov/aqsweb/aqstmp/airdata/download_files.html).
 ***
 
 This repository contains the following files:
-* README.md: This file!
+* README.md
 
 * plot1.png: Boxplots of fine particulate pollution in 2009 and 2012. Includes level and log transformations.
 
